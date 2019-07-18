@@ -1,5 +1,5 @@
 from graphics.graphics import *
-
+from rl import World
 
 def grid_draw(x1, y1, x2, y2, size, win):
     for i in range(0, size):
@@ -11,6 +11,8 @@ def grid_draw(x1, y1, x2, y2, size, win):
 
 
 def main():
+    w = World.World(4, 4)
+    w.build_gridworld()
     win = GraphWin("My window", 500, 500)
     print(win)
     win.setBackground('white')

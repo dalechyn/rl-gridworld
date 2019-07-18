@@ -4,6 +4,9 @@ class Action:
         self.state_old = None
         self.state_new = None
 
+    def __repr__(self):
+        return "<Action name: %s" % self.name
+
     def link(self, state_new, state_old):
         self.state_new = state_new
         self.state_old = state_old
