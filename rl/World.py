@@ -3,52 +3,63 @@ from .State import State
 
 
 class World:
-    def __init__(self, width, height):
+    def __init__(self, width, height, gamma=0.01, d_rate=0.8):
         self.width = width
         self.height = height
         self.states = [None] * width * height
-        self.actions = []
+        self.gamma = gamma
+        self.d_rate = d_rate
 
     def get_size(self):
         return self.width, self.height
 
+    def value_iteration(self):
+        for s in self.states:
+            actions = [a for a in s.actions]
+            best_neighbour = actions[0]
+            for a in range(1, len(actions)):
+                if actions[a].state_new.value > best_neighbour.value:
+                    best_neighbour = actions[a].state_new
+
+            s.value = s.reward + self.d_rate * best_neighbour.value
+
     def build_gridworld(self):
-        def cell_opened():
+        def yx(y, x): return y * self.width + x
+
+        def spawn_cell_opened(y, x):
             # initially reward is -1, so agent looses reward while moving
-            return State({
+            self.states[yx(y, x)] = State({
                 'up': Action('up'),
                 'down': Action('down'),
                 'left': Action('left'),
                 'right': Action('right')
-            }, -1)
+            }, yx(y, x), -1)
 
-        def cell_allowed(actions_allowed):
+        def spawn_cell_limited(y, x, actions_allowed):
             actions = {}
             for name in actions_allowed:
                 actions[name] = Action(name)
-            return State(actions, -1)
-
-        def yx(y, x): return y * self.width + x
+            self.states[yx(y, x)] = State(actions, yx(y, x), -1)
 
         # generating states
         # middle ones
         for i in range(1, self.height - 1):
             for j in range(1, self.width - 1):
-                self.states[yx(i, j)] = cell_opened()
+                spawn_cell_opened(i, j)
 
         # on the sides
         for i in range(1, self.height - 1):
-            self.states[yx(i, 0)] = cell_allowed(['up', 'down', 'right'])
-            self.states[yx(i, self.width - 1)] = cell_allowed(['up', 'down', 'left'])
+            spawn_cell_limited(i, 0, ['up', 'down', 'right'])
+            spawn_cell_limited(i, self.width - 1, ['up', 'down', 'left'])
         for j in range(1, self.width - 1):
-            self.states[yx(0, j)] = cell_allowed(['down', 'left', 'right'])
-            self.states[yx(self.height - 1, j)] = cell_allowed(['up', 'left', 'right'])
+            spawn_cell_limited(0, j, ['down', 'left', 'right'])
+            spawn_cell_limited(self.height - 1, j, ['up', 'left', 'right'])
 
         # corners
-        self.states[yx(0, 0)] = cell_allowed(['down', 'right'])
-        self.states[yx(0, self.width - 1)] = cell_allowed(['down', 'left'])
-        self.states[yx(self.height - 1, 0)] = cell_allowed(['up', 'right'])
-        self.states[yx(self.height - 1, self.width - 1)] = cell_allowed(['up', 'left'])
+        spawn_cell_limited(0, 0, ['down', 'right'])
+        spawn_cell_limited(0, self.width - 1, ['down', 'left'])
+        spawn_cell_limited(self.height - 1, 0, ['up', 'right'])
+        spawn_cell_limited(self.height - 1, self.width - 1, ['up', 'left'])
 
         # connecting states between each other
         # the middle ones
