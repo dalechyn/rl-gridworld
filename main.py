@@ -1,5 +1,5 @@
 from graphics.graphics import *
-from rl import World
+from rl.World import World
 
 
 def grid_draw(x1, y1, x2, y2, size_x, size_y, win):
@@ -18,20 +18,29 @@ def grid_draw(x1, y1, x2, y2, size_x, size_y, win):
         'size_y': size_y
     }
 
+
 def render(world, grid, win):
     # rendering world states
+    q_value_max = max([world.agent.q[s.world_pos][world.agent.get_best_action(s).name]
+                       for s in world.states])
     for s in world.states:
         # rendering state
         x = s.world_pos % world.width
         y = s.world_pos / world.width
-        drawable = Rectangle(Point(grid['x1'] + x * grid['size_x'], grid['y1'] + y * grid['size_y']),
-                  Point(grid['x1'] + (x + 1) * grid['size_x'], grid['y1'] + (y + 1) * grid['size_y']))
-        #drawable.setFill(color_rgb())
+        drawable = Rectangle(Point(grid['x1'] + x * grid['size_x'],
+                                   grid['y1'] + y * grid['size_y']),
+                             Point(grid['x1'] + (x + 1) * grid['size_x'],
+                                   grid['y1'] + (y + 1) * grid['size_y']))
+        q_s_value = world.agent.q[s.world_pos][world.agent.get_best_action(s).name]
+        drawable.setFill(color_rgb(63 - 63 * q_s_value / q_value_max,
+                                   127 + 128 * q_s_value / q_value_max,
+                                   63 - 63 * q_s_value / q_value_max))
+        drawable.draw(win)
 
 
 def main():
-    w = World.World(4, 4)
-    w.build_gridworld()
+    w = World(4, 4)
+    w.randomize_reward()
     win = GraphWin("My window", 500, 500)
     win.setBackground('white')
     grid = grid_draw(10, 10, 490, 490, 4, 4, win)

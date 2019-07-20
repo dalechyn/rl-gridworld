@@ -1,5 +1,6 @@
 from random import random, randint
 
+
 class Agent:
     def __init__(self, world, state_start, epsilon=0.2, gamma=0.8, learning_rate=0.1):
         self.state = state_start
@@ -21,11 +22,11 @@ class Agent:
         # q table initialization
         for i in range(0, h):
             for j in range(0, w):
-                for a in world.actions:
+                for a in world.states[i * world.width + j].actions.values():
                     self.q[i * world.width + j][a.name] = 0
 
     def get_best_action(self, state):
-        actions = [a for a in state.actions]
+        actions = [a for a in state.actions.values()]
         best_action = actions[0]
         for i in range(1, len(actions)):
             w_pos = state.world_pos
@@ -48,7 +49,6 @@ class Agent:
         self.q[self.state.world_pos][action.name] = average_update
 
     def step(self):
-        action = None
         if random() < self.epsilon:
             action = [a for a in self.state.actions][randint(0, len(self.state.actions))]
         else:

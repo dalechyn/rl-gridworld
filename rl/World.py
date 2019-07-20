@@ -1,5 +1,7 @@
 from .Action import Action
 from .State import State
+from .Agent import Agent
+from random import random
 
 
 class World:
@@ -7,23 +9,10 @@ class World:
         self.width = width
         self.height = height
         self.states = [None] * width * height
+        self.agent = None
         self.gamma = gamma
         self.d_rate = d_rate
 
-    def get_size(self):
-        return self.width, self.height
-
-    def value_iteration(self):
-        for s in self.states:
-            actions = [a for a in s.actions]
-            best_neighbour = actions[0]
-            for a in range(1, len(actions)):
-                if actions[a].state_new.value > best_neighbour.value:
-                    best_neighbour = actions[a].state_new
-
-            s.value = s.reward + self.d_rate * best_neighbour.value
-
-    def build_gridworld(self):
         def yx(y, x): return y * self.width + x
 
         def spawn_cell_opened(y, x):
@@ -105,3 +94,28 @@ class World:
         state_cur = self.states[yx(self.height - 1, self.width - 1)]
         state_cur.link('up', self.states[yx(self.height - 2, self.width - 1)])
         state_cur.link('left', self.states[yx(self.height - 1, self.width - 2)])
+        self.add_agent()
+
+    def get_size(self):
+        return self.width, self.height
+
+    def randomize_reward(self):
+        for s in self.states:
+            s.reward = random()
+
+    def value_iteration(self):
+        for s in self.states:
+            actions = [a for a in s.actions]
+            best_neighbour = actions[0]
+            for a in range(1, len(actions)):
+                if actions[a].state_new.value > best_neighbour.value:
+                    best_neighbour = actions[a].state_new
+
+            s.value = s.reward + self.d_rate * best_neighbour.value
+
+    def add_agent(self, state=None):
+        if state is None:
+            state = self.states[0]
+        agent = Agent(self, state)
+        self.agent = agent
+        return agent
