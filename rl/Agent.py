@@ -2,7 +2,7 @@ from random import random, randint
 
 
 class Agent:
-    def __init__(self, world, state_start, epsilon=0.2, gamma=0.8,
+    def __init__(self, world, state_start, epsilon=0.2, discount_factor=0.8,
                  learning_rate=0.1):
         self.state = state_start
 
@@ -10,9 +10,9 @@ class Agent:
             raise ValueError('Epsilon has to be in range [0...1]')
         self.epsilon = epsilon
 
-        if gamma < 0 or gamma > 1:
-            raise ValueError('Gamma has to be in range [0...1]')
-        self.gamma = gamma
+        if discount_factor < 0 or discount_factor > 1:
+            raise ValueError('Discount factor has to be in range [0...1]')
+        self.discount_factor = discount_factor
 
         if learning_rate < 0 or learning_rate > 1:
             raise ValueError('Learning rate has to be in range [0...1]')
@@ -43,7 +43,7 @@ class Agent:
 
         w_pos = state_new.world_pos
         ba_name = best_action.name
-        target_value = reward + self.gamma * self.q[w_pos][ba_name]
+        target_value = reward + self.discount_factor * self.q[w_pos][ba_name]
         average_update = self.q[self.state.world_pos][action.name] * \
             (1 - self.learning_rate) + target_value * self.learning_rate
 
