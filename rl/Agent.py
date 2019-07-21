@@ -2,7 +2,8 @@ from random import random, randint
 
 
 class Agent:
-    def __init__(self, world, state_start, epsilon=0.2, gamma=0.8, learning_rate=0.1):
+    def __init__(self, world, state_start, epsilon=0.2, gamma=0.8,
+                 learning_rate=0.1):
         self.state = state_start
 
         if epsilon < 0 or epsilon > 1:
@@ -50,7 +51,8 @@ class Agent:
 
     def step(self):
         if random() < self.epsilon:
-            action = [a for a in self.state.actions][randint(0, len(self.state.actions))]
+            action = [a for a in self.state.actions.values()]\
+                [randint(0, len(self.state.actions) - 1)]
         else:
             action = self.get_best_action(self.state)
 

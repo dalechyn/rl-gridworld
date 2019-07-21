@@ -101,12 +101,12 @@ class World:
 
     def randomize_reward(self):
         for s in self.states:
-            s.reward = random()
+            s.reward = 2 * random() - 1
 
     def value_iteration(self):
         for s in self.states:
-            actions = [a for a in s.actions]
-            best_neighbour = actions[0]
+            actions = [a for a in s.actions.values()]
+            best_neighbour = actions[0].state_new
             for a in range(1, len(actions)):
                 if actions[a].state_new.value > best_neighbour.value:
                     best_neighbour = actions[a].state_new

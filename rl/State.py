@@ -6,7 +6,8 @@ class State:
         self.value = 0
 
     def __repr__(self):
-        return '<State>: {\n\t\t' + ''.join([a.__repr__() + '\n\t\t' for a in self.actions]) + '}\n'
+        return '<State>: {\n\t\t' + \
+               ''.join([a.__repr__() + '\n\t\t' for a in self.actions]) + '}\n'
 
     def link(self, dr, state):
         self.actions[dr].state_old = self
